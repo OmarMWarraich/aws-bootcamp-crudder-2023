@@ -16,10 +16,10 @@ from services.show_activity import *
 app = Flask(__name__)
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
-origins = [frontend, backend]
+# origins = ["http://localhost:3000", "http://localhost:4567"]
 cors = CORS(
   app, 
-  resources={r"/api/*": {"origins": origins}},
+  resources={r"/api/*": {"origins": "*"}},
   expose_headers="location,link",
   allow_headers="content-type,if-modified-since",
   methods="OPTIONS,GET,HEAD,POST"
@@ -114,4 +114,4 @@ def data_activities_reply(activity_uuid):
   return
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run(debug=True, host='0.0.0.0', port=4567)
