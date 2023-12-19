@@ -55,19 +55,20 @@ provider.add_span_processor(processor)
 rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
 
 # xray
-# xray_url = os.getenv("AWS_XRAY_URL")
-# xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
+xray_url = os.getenv("AWS_XRAY_URL")
+xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
 
 # Show spans in the console while developing
-simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
-provider.add_span_processor(simple_processor)
+# simple_processor = SimpleSpanProcessor(ConsoleSpanExporter())
+# provider.add_span_processor(simple_processor)
 
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
 
-# XRayMiddleware(app, xray_recorder)
+# xray
+XRayMiddleware(app, xray_recorder)
 
 # Honeycomb
 # Initialize automatic instrumentation with Flask
@@ -161,6 +162,7 @@ def data_notifications():
   return data, 200
 
 @app.route("/api/activities/@<string:handle>", methods=['GET'])
+@xray_recorder.capture('user_activities')
 def data_handle(handle):
   model = UserActivities.run(handle)
   if model['errors'] is not None:
