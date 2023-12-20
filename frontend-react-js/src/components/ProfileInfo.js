@@ -4,7 +4,6 @@ import React from "react";
 
 import { Auth } from 'aws-amplify';
 // [TODO] Authenication
-import Cookies from 'js-cookie'
 
 export default function ProfileInfo(props) {
   const [popped, setPopped] = React.useState(false);
@@ -16,9 +15,16 @@ export default function ProfileInfo(props) {
   const signOut = async () => {
     try {
         await Auth.signOut({ global: true });
-        window.location.href = "/"
+        window.location.href = "/";
+        localStorage.removeItem("access_token");
     } catch (error) {
+      if (error.code === "NotAuthorizedException") {
+        console.log("Token has been revoked");
+        // Redirect to the login page
+        window.location.href = "signin";
+      } else {
         console.log('error signing out: ', error);
+      }
     }
   }
 
